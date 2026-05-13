@@ -17,21 +17,19 @@
 
 <div id="login-overlay" class="fixed inset-0 flex items-center justify-center p-6">
     <div class="bg-white rounded-[2.5rem] p-10 w-full max-w-md shadow-2xl text-center">
-        <div class="w-20 h-20 bg-blue-50 text-blue-900 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+        <div class="w-20 h-20 bg-blue-50 text-blue-900 rounded-3xl flex items-center justify-center mx-auto mb-6">
             <span class="material-symbols-outlined text-4xl">verified_user</span>
         </div>
         <h2 class="text-3xl font-black text-slate-900 mb-2 tracking-tighter">Acceso Injusa</h2>
-        <p class="text-slate-400 text-sm mb-8 font-medium">Es necesario identificarse para consultar y reservar stock.</p>
+        <p class="text-slate-400 text-sm mb-8">Identifícate para gestionar el stock.</p>
         
-        <div class="space-y-4">
-            <input id="user-name-input" type="text" 
-                   class="w-full bg-slate-100 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl px-6 py-4 text-center font-bold transition-all outline-none" 
-                   placeholder="Nombre y Apellido">
-            
-            <button onclick="saveUser()" class="w-full bg-blue-900 text-white font-bold py-4 rounded-2xl hover:bg-blue-800 transition-all shadow-lg active:scale-95">
-                Entrar al Panel
-            </button>
-        </div>
+        <input id="user-name-input" type="text" 
+               class="w-full bg-slate-100 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl px-6 py-4 text-center font-bold transition-all outline-none mb-4" 
+               placeholder="Nombre y Apellido">
+        
+        <button onclick="saveUser()" class="w-full bg-blue-900 text-white font-bold py-4 rounded-2xl hover:bg-blue-800 transition-all shadow-lg active:scale-95">
+            Entrar al Panel
+        </button>
     </div>
 </div>
 
@@ -47,7 +45,7 @@
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <input id="search-input" class="bg-slate-100 border-none rounded-full px-4 py-1 text-sm w-32 md:w-64" placeholder="Buscar..." type="text"/>
+            <input id="search-input" class="bg-slate-100 border-none rounded-full px-4 py-1 text-sm w-32 md:w-64" placeholder="Buscar Referencia..." type="text"/>
             <button onclick="loadData()" class="p-2 text-slate-400 hover:text-blue-900"><span id="sync-icon" class="material-symbols-outlined">sync</span></button>
         </div>
     </header>
@@ -55,9 +53,11 @@
     <main class="mt-16 min-h-screen yolo-gradient p-4 md:p-8">
         <div class="mb-8 text-white">
             <h2 class="text-4xl font-black italic tracking-tight">Reservas Live</h2>
-            <div class="flex items-center gap-2 mt-2">
+            <div class="flex items-center gap-2 mt-2 text-white/60">
                 <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <p id="counter-text" class="text-white/60 text-[10px] font-bold uppercase tracking-widest">Sincronizando catálogo...</p>
+                <p id="counter-text" class="text-[10px] font-bold uppercase tracking-widest">Cargando unidades...</p>
+                <span class="mx-2">|</span>
+                <p id="timer-display" class="text-[10px] font-bold uppercase tracking-widest">Sesión Activa</p>
             </div>
         </div>
         <div id="main-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-24"></div>
@@ -65,19 +65,43 @@
 </div>
 
 <script>
-    // CONFIGURACIÓN - IMPORTANTE: PEGA TU URL DE APPS SCRIPT AQUÍ
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOFHYjuBwOkQDfuedrjriM5oOpr10nc2JkTHqpgGgGviGA3Lsu38wnYD4njQIf9m3266qay2G0Z8ed/pub?gid=0&single=true&output=csv';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrA1Orsz1fq-yqkjuV9O7A5QXKD3LskigAj_-ciPYgdG11EtMp31ye_xxrjlbzyqOPKw/exec';
     
+    // CONFIGURACIÓN DE TIEMPO (en minutos)
+    const MINUTOS_INACTIVIDAD = 15;
+    
     let allData = [];
     let userName = localStorage.getItem('injusa_user');
+    let t_inactividad;
 
-    // Al cargar la página, verificamos si ya existe usuario
     window.onload = () => {
-        if (userName) {
-            initApp();
-        }
+        if (userName) initApp();
+        resetTimer(); // Iniciar cronómetro de actividad
     };
+
+    // --- LÓGICA DE CIERRE POR INACTIVIDAD ---
+    function resetTimer() {
+        clearTimeout(t_inactividad);
+        if (userName) {
+            t_inactividad = setTimeout(logoutAutomatico, MINUTOS_INACTIVIDAD * 60 * 1000);
+        }
+    }
+
+    // Escuchar actividad del usuario
+    window.onmousemove = resetTimer;
+    window.onmousedown = resetTimer;
+    window.ontouchstart = resetTimer;
+    window.onclick = resetTimer;
+    window.onkeydown = resetTimer;
+
+    function logoutAutomatico() {
+        if (userName) {
+            localStorage.removeItem('injusa_user');
+            alert("Sesión cerrada por inactividad (" + MINUTOS_INACTIVIDAD + " min). Por seguridad, identifícate de nuevo.");
+            location.reload();
+        }
+    }
 
     function initApp() {
         document.getElementById('login-overlay').style.display = 'none';
@@ -95,9 +119,9 @@
     }
 
     function logout() {
-        if(confirm("¿Quieres cerrar sesión? Se borrará tu nombre del dispositivo.")){
+        if(confirm("¿Quieres cerrar la sesión actual?")){
             localStorage.removeItem('injusa_user');
-            location.reload(); // Recarga la página para mostrar el login de nuevo
+            location.reload();
         }
     }
 
@@ -145,22 +169,21 @@
     }
 
     async function reservar(id, stockMax) {
-        const cant = prompt(`¿Unidades de ${id} para reservar?\n(Máximo disponible: ${Math.round(stockMax)})`);
+        const cant = prompt(`¿Cuántas unidades de la Referencia ${id} quieres reservar?\n(Máximo disponible: ${Math.round(stockMax)})`);
         if (!cant || isNaN(cant) || cant <= 0 || parseInt(cant) > stockMax) return;
 
         const btn = event.target;
-        btn.innerText = "Enviando...";
+        btn.innerText = "Procesando...";
         btn.disabled = true;
 
         try {
-            // Enviamos el nombre guardado automáticamente
             await fetch(`${SCRIPT_URL}?id=${id}&unidades=${cant}&nombre=${encodeURIComponent(userName)}`, { mode: 'no-cors' });
-            alert(`Reserva de ${cant} uds. confirmada.\nRegistrado a nombre de: ${userName}`);
+            alert(`Reserva de ${cant} unidades confirmada.\nRegistrado a nombre de: ${userName}`);
             setTimeout(loadData, 2000);
         } catch (e) {
             alert("Error al conectar.");
         } finally {
-            btn.innerText = "Reservar Stock";
+            btn.innerText = "Reservar Unidades";
             btn.disabled = false;
         }
     }
@@ -174,14 +197,14 @@
             card.innerHTML = `
                 <div>
                     <div class="flex justify-between items-center mb-6">
-                        <span class="bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">ID: ${item.id}</span>
+                        <span class="bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">Referencia: ${item.id}</span>
                         <span class="text-green-400 material-symbols-outlined">verified</span>
                     </div>
                     <p class="text-5xl font-black mb-1 tracking-tighter">${Math.round(item.total)}</p>
-                    <p class="text-xs opacity-50 font-bold uppercase mb-8 text-sky-200">Stock Actual</p>
+                    <p class="text-xs opacity-50 font-bold uppercase mb-8 text-sky-200 font-bold">Unidades Totales</p>
                 </div>
-                <button onclick="reservar('${item.id}', ${item.total})" class="w-full bg-white text-blue-900 font-bold py-4 rounded-2xl hover:bg-blue-50 transition-all shadow-lg active:scale-95">
-                    Reservar Stock
+                <button onclick="reservar('${item.id}', ${item.total})" class="w-full bg-white text-blue-900 font-bold py-4 rounded-2xl hover:bg-blue-50 transition-all shadow-lg active:scale-95 uppercase text-xs tracking-widest">
+                    Reservar Unidades
                 </button>
             `;
             grid.appendChild(card);

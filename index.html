@@ -2,30 +2,28 @@
 <html class="light" lang="es">
 <head>
     <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Injusa InventoryPro - Control de Ventas</title>
+    <title>Injusa InventoryPro - Control Total</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <style>
         .yolo-gradient { background: radial-gradient(circle at top right, #26509F, #0b1c30), linear-gradient(135deg, #26509F 0%, #0ea5e9 100%); background-blend-mode: overlay; }
         .floating-card { backdrop-filter: blur(15px); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
-        #login-overlay { backdrop-filter: blur(30px); background: rgba(11, 28, 48, 0.9); }
+        #login-overlay { backdrop-filter: blur(30px); background: rgba(11, 28, 48, 0.95); }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 antialiased overflow-x-hidden">
 
-<div id="login-overlay" class="fixed inset-0 z-[100] flex items-center justify-center p-6 transition-opacity duration-500">
+<div id="login-overlay" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
     <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
         <div class="w-20 h-20 bg-blue-100 text-blue-900 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <span class="material-symbols-outlined text-4xl">person_pin</span>
         </div>
         <h2 class="text-2xl font-black text-slate-900 mb-2">Acceso Comercial</h2>
-        <p class="text-slate-500 text-sm mb-8">Introduce tu nombre para gestionar las reservas de Injusa.</p>
-        <input id="user-name-input" type="text" class="w-full bg-slate-100 border-none rounded-2xl px-6 py-4 mb-4 text-center font-bold focus:ring-2 focus:ring-blue-500" placeholder="Tu nombre y apellido">
-        <button onclick="saveUser()" class="w-full bg-blue-900 text-white font-bold py-4 rounded-2xl hover:bg-blue-800 transition-all">
-            Entrar al Panel
-        </button>
+        <p class="text-slate-500 text-sm mb-8">Identifícate para gestionar el stock de Injusa.</p>
+        <input id="user-name-input" type="text" class="w-full bg-slate-100 border-none rounded-2xl px-6 py-4 mb-4 text-center font-bold focus:ring-2 focus:ring-blue-500" placeholder="Tu nombre">
+        <button onclick="saveUser()" class="w-full bg-blue-900 text-white font-bold py-4 rounded-2xl hover:bg-blue-800 transition-all">Entrar</button>
     </div>
 </div>
 
@@ -43,7 +41,10 @@
 <main class="mt-16 min-h-screen yolo-gradient p-4 md:p-8">
     <div class="mb-6 text-white">
         <h2 class="text-3xl font-bold italic">Panel de Reservas</h2>
-        <p id="counter-text" class="text-xs opacity-70 font-bold uppercase tracking-widest mt-1">Sincronizando...</p>
+        <div class="flex items-center gap-2 mt-1">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <p id="counter-text" class="text-white/60 text-[10px] font-bold uppercase tracking-widest">Sincronizando con central...</p>
+        </div>
     </div>
     <div id="main-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-24"></div>
 </main>
@@ -55,10 +56,9 @@
     let allData = [];
     let userName = localStorage.getItem('injusa_user');
 
-    // CONTROL DE USUARIO
     window.onload = () => {
         if (userName) {
-            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('current-user-tag').innerText = userName;
             loadData();
         }
@@ -66,15 +66,20 @@
 
     function saveUser() {
         const input = document.getElementById('user-name-input').value.trim();
-        if (input.length < 3) {
-            alert("Por favor, pon un nombre válido.");
-            return;
-        }
+        if (input.length < 2) return alert("Pon tu nombre.");
         localStorage.setItem('injusa_user', input);
         userName = input;
-        document.getElementById('login-overlay').classList.add('hidden');
+        document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('current-user-tag').innerText = userName;
         loadData();
+    }
+
+    function cleanNumber(val) {
+        if (!val) return 0;
+        let s = String(val).trim();
+        if (s === '–' || s === '-' || s === '') return 0;
+        s = s.replace(/\./g, '').replace(',', '.');
+        return parseFloat(s) || 0;
     }
 
     async function loadData() {
@@ -84,44 +89,52 @@
             const response = await fetch(SHEET_URL + '&cb=' + Date.now());
             const csvText = await response.text();
             const workbook = XLSX.read(csvText, { type: 'string' });
-            const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { range: 6 });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const fullRows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            // ESCÁNER DINÁMICO: Buscamos dónde están ID y TOTAL
+            let headerIdx = fullRows.findIndex(row => 
+                row.some(c => String(c).trim().toUpperCase() === 'ID') && 
+                row.some(c => String(c).trim().toUpperCase() === 'TOTAL')
+            );
+
+            if (headerIdx === -1) headerIdx = 6; // Por si falla, volvemos al estándar
+
+            const data = XLSX.utils.sheet_to_json(sheet, { range: headerIdx });
 
             allData = data.filter(item => {
                 const kID = Object.keys(item).find(k => k.trim().toUpperCase() === 'ID');
                 const kTotal = Object.keys(item).find(k => k.trim().toUpperCase() === 'TOTAL');
-                const stock = parseFloat(String(item[kTotal]).replace(/\./g, '').replace(',', '.'));
-                return item[kID] && stock > 0;
+                if (!kID || !kTotal) return false;
+                const id = String(item[kID]).trim();
+                const stock = cleanNumber(item[kTotal]);
+                return id && id.toLowerCase() !== 'totales' && stock > 0;
             }).map(item => {
                 const kID = Object.keys(item).find(k => k.trim().toUpperCase() === 'ID');
                 const kTotal = Object.keys(item).find(k => k.trim().toUpperCase() === 'TOTAL');
-                return { id: String(item[kID]).trim(), total: parseFloat(String(item[kTotal]).replace(/\./g, '').replace(',', '.')) };
+                return { id: String(item[kID]).trim(), total: cleanNumber(item[kTotal]) };
             });
 
             renderGrid(allData);
-            document.getElementById('counter-text').innerText = `${allData.length} Referencias Disponibles`;
+            document.getElementById('counter-text').innerText = `${allData.length} Refs Disponibles`;
         } catch (e) { console.error(e); }
         finally { syncIcon.classList.remove('animate-spin'); }
     }
 
     async function reservar(id, stockMax) {
-        const cant = prompt(`¿Cuántas unidades de ${id} quieres reservar?\n(Máximo disponible: ${Math.round(stockMax)})`);
-        if (!cant || isNaN(cant) || cant <= 0) return;
-        if (parseInt(cant) > stockMax) {
-            alert("No hay suficiente stock.");
-            return;
-        }
+        const cant = prompt(`¿Unidades de ${id} para reservar?\n(Máximo: ${Math.round(stockMax)})`);
+        if (!cant || isNaN(cant) || cant <= 0 || parseInt(cant) > stockMax) return alert("Cantidad no válida.");
 
         const btn = event.target;
         btn.innerText = "Procesando...";
         btn.disabled = true;
 
         try {
-            // Enviamos ID, Unidades y el NOMBRE del comercial
             await fetch(`${SCRIPT_URL}?id=${id}&unidades=${cant}&nombre=${encodeURIComponent(userName)}`, { mode: 'no-cors' });
-            alert(`¡Reserva confirmada por ${userName}!\nSe han descontado ${cant} unidades.`);
+            alert(`Reserva de ${cant} uds. confirmada por ${userName}.`);
             setTimeout(loadData, 2000);
         } catch (e) {
-            alert("Error al conectar con el servidor.");
+            alert("Error de conexión.");
         } finally {
             btn.innerText = "Reservar Stock";
             btn.disabled = false;
@@ -141,9 +154,9 @@
                         <span class="text-green-400 material-symbols-outlined">check_circle</span>
                     </div>
                     <p class="text-4xl font-black mb-1">${Math.round(item.total)}</p>
-                    <p class="text-xs opacity-50 font-bold uppercase mb-6 text-sky-200">En Almacén</p>
+                    <p class="text-xs opacity-50 font-bold uppercase mb-6 text-sky-200">Unidades Disponibles</p>
                 </div>
-                <button onclick="reservar('${item.id}', ${item.total})" class="w-full bg-white text-blue-900 font-bold py-3 rounded-2xl hover:bg-blue-50 transition-colors shadow-lg active:scale-95">
+                <button onclick="reservar('${item.id}', ${item.total})" class="w-full bg-white text-blue-900 font-bold py-3 rounded-2xl hover:bg-blue-50 transition-all shadow-lg active:scale-95">
                     Reservar Stock
                 </button>
             `;

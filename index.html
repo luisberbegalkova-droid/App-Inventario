@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html class="light" lang="es">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Injusa InventoryPro - Orbital v2</title>
+    <title>Injusa InventoryPro - Full Suite</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -11,143 +11,109 @@
 
     <script id="tailwind-config">
         tailwind.config = {
-          darkMode: "class",
           theme: {
             extend: {
               "colors": {
                 "injusa-blue": "#26509F",
-                "on-error-container": "#93000a",
-                "surface-dim": "#cbdbf5",
-                "tertiary-container": "#2a1700",
-                "secondary-container": "#2170e4",
-                "tertiary-fixed-dim": "#ffb95f",
-                "on-tertiary": "#ffffff",
-                "on-surface": "#0b1c30",
-                "inverse-surface": "#213145",
-                "on-tertiary-container": "#b87500",
-                "surface-variant": "#d3e4fe",
-                "surface": "#f8f9ff",
-                "on-secondary": "#ffffff",
-                "surface-tint": "#565e74",
-                "on-surface-variant": "#45464d",
-                "on-primary-container": "#7c839b",
-                "surface-bright": "#f8f9ff",
-                "on-primary-fixed-variant": "#3f465c",
-                "tertiary-fixed": "#ffddb8",
-                "inverse-primary": "#bec6e0",
-                "secondary-fixed-dim": "#adc6ff",
-                "primary-container": "#131b2e",
                 "secondary": "#26509F",
-                "outline-variant": "#c6c6cd",
-                "error": "#ba1a1a",
-                "surface-container-highest": "#d3e4fe",
-                "on-tertiary-fixed": "#2a1700",
-                "on-secondary-fixed": "#001a42",
-                "primary-fixed-dim": "#bec6e0",
-                "primary": "#0b1c30",
-                "outline": "#76777d",
-                "tertiary": "#ea580c",
-                "on-tertiary-fixed-variant": "#653e00",
-                "surface-container-low": "#eff4ff",
-                "background": "#f8f9ff",
-                "on-error": "#ffffff",
-                "on-secondary-container": "#fefcff",
-                "on-background": "#0b1c30",
-                "secondary-fixed": "#d8e2ff",
-                "inverse-on-surface": "#eaf1ff",
-                "surface-container-lowest": "#ffffff",
-                "on-primary-fixed": "#131b2e",
-                "surface-container-high": "#dce9ff",
-                "surface-container": "#e5eeff",
-                "on-primary": "#ffffff",
-                "on-secondary-fixed-variant": "#004395",
-                "error-container": "#ffdad6",
-                "primary-fixed": "#dae2fd"
+                "surface": "#f8f9ff",
+                "on-surface": "#0b1c30",
+                "outline-variant": "#c6c6cd"
               },
-              "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
-              "spacing": { "sm": "16px", "md": "24px", "container-max": "1440px", "xs": "8px", "xl": "48px", "lg": "32px", "gutter": "24px", "base": "4px" },
-              "fontFamily": { "display-lg": ["Inter"], "body-sm": ["Inter"], "data-mono": ["Inter"], "headline-md": ["Inter"], "title-sm": ["Inter"], "label-caps": ["Inter"], "body-md": ["Inter"], "serif-display": ["Playfair Display", "serif"] },
-              "fontSize": { "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}], "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}], "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}], "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}], "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}], "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}] }
+              "fontFamily": {
+                "serif-display": ["Playfair Display", "serif"],
+                "body-md": ["Inter", "sans-serif"]
+              }
             },
           },
         }
     </script>
     <style>
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
-        .yolo-gradient { background: radial-gradient(circle at top right, #26509F, #131b2e), linear-gradient(135deg, #26509F 0%, #ea580c 100%); background-blend-mode: overlay; }
-        .orb-depth { background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.4) 100%); box-shadow: inset -10px -10px 40px rgba(0,0,0,0.5), 0 0 80px rgba(38, 80, 159, 0.3); }
-        .floating-card { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.5s ease; }
-        .orbit-1 { transform: rotate(0deg) translate(340px) rotate(0deg); }
-        .orbit-2 { transform: rotate(72deg) translate(340px) rotate(-72deg); }
-        .orbit-3 { transform: rotate(144deg) translate(340px) rotate(-144deg); }
-        .orbit-4 { transform: rotate(216deg) translate(340px) rotate(-216deg); }
-        .orbit-5 { transform: rotate(288deg) translate(340px) rotate(-288deg); }
-        .glow-border { box-shadow: 0 0 15px rgba(38, 80, 159, 0.5), inset 0 0 10px rgba(38, 80, 159, 0.5); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        
+        /* Fondo dinámico Injusa */
+        .yolo-gradient { 
+            background: radial-gradient(circle at top right, #26509F, #0b1c30), 
+                        linear-gradient(135deg, #26509F 0%, #0ea5e9 100%); 
+            background-blend-mode: overlay; 
+        }
+
+        /* Tarjetas de cristal para las referencias */
+        .floating-card {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .floating-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(14, 165, 233, 0.2);
+        }
+
+        /* Scrollbar invisible pero funcional */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased overflow-hidden">
 
-<aside class="fixed left-0 top-0 h-full w-[280px] border-r border-outline-variant bg-surface flex flex-col py-md px-sm z-50">
-    <div class="mb-xl px-xs">
-        <h1 class="font-display-lg text-display-lg font-bold text-injusa-blue">Injusa</h1>
-        <p class="font-body-md text-body-md text-on-surface-variant">InventoryPro Portal</p>
+<aside class="fixed left-0 top-0 h-full w-[280px] border-r border-outline-variant bg-white flex flex-col py-6 px-4 z-50">
+    <div class="mb-10 px-2">
+        <h1 class="text-2xl font-black text-injusa-blue tracking-tighter">INJUSA</h1>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">InventoryPro</p>
     </div>
-    <nav class="flex-1 space-y-xs">
-        <div class="flex items-center gap-sm px-md py-sm rounded-lg bg-secondary-container text-white font-semibold">
+    <nav class="flex-1 space-y-1">
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-injusa-blue font-bold">
             <span class="material-symbols-outlined">inventory_2</span>
-            <span class="font-body-md">Stock 12W</span>
+            <span>Stock Total 12W</span>
+        </div>
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-50 transition-colors cursor-not-allowed">
+            <span class="material-symbols-outlined">history</span>
+            <span>Historial</span>
         </div>
     </nav>
-    <div class="mt-auto space-y-xs pt-md border-t border-outline-variant text-center">
-        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Sincronizado con Central</p>
+    <div class="mt-auto pt-6 border-t border-outline-variant">
+        <div class="bg-slate-900 rounded-2xl p-4 text-white">
+            <p class="text-[10px] font-bold opacity-50 uppercase mb-1">Usuario</p>
+            <p class="text-sm font-bold">Dpto. Comercial</p>
+        </div>
     </div>
 </aside>
 
-<header class="fixed top-0 right-0 w-[calc(100%-280px)] h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-lg z-40">
-    <div class="flex items-center gap-md">
-        <div class="relative focus-within:ring-2 focus-within:ring-secondary/20 rounded-lg">
-            <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-            <input id="search-input" class="bg-surface-container-low border-none rounded-lg pl-xl pr-md py-xs w-64 text-body-sm" placeholder="Buscar ID de referencia..." type="text"/>
-        </div>
+<header class="fixed top-0 right-0 w-[calc(100%-280px)] h-16 bg-white border-b border-outline-variant flex justify-between items-center px-8 z-40">
+    <div class="relative w-96">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+        <input id="search-input" class="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-injusa-blue/20" placeholder="Buscar referencia..." type="text"/>
     </div>
-    <div class="flex items-center gap-lg">
-        <div class="flex items-center gap-sm">
-            <div class="text-right">
-                <p class="font-title-sm text-title-sm text-primary">Luis Berbegal</p>
-                <p class="text-xs text-on-surface-variant">Injusa Sales Dept.</p>
-            </div>
-            <div class="w-10 h-10 rounded-full bg-injusa-blue flex items-center justify-center text-white font-bold">LB</div>
+    <div class="flex items-center gap-4">
+        <div id="sync-status" class="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-full">
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span class="text-[10px] font-bold text-green-700 uppercase">Live Data</span>
         </div>
+        <button onclick="loadData()" class="p-2 hover:bg-slate-100 rounded-full transition-colors">
+            <span id="sync-icon" class="material-symbols-outlined text-slate-600">sync</span>
+        </button>
     </div>
 </header>
 
-<main class="ml-[280px] mt-16 h-[calc(100vh-64px)] relative yolo-gradient overflow-hidden flex items-center justify-center">
-    <div class="text-center absolute top-12 z-20">
-        <h2 class="font-serif-display text-display-lg italic text-white drop-shadow-lg mb-xs">Live Inventory Highlights</h2>
-        <p id="status-text" class="text-white/70 font-body-md tracking-widest uppercase text-label-caps">Mostrando excedentes positivos</p>
+<main class="ml-[280px] mt-16 h-[calc(100vh-64px)] relative yolo-gradient flex flex-col p-8 overflow-hidden">
+    
+    <div class="mb-8">
+        <h2 class="font-serif-display text-4xl italic text-white drop-shadow-md">Stock Excedente Proyectado</h2>
+        <p id="counter-text" class="text-white/60 text-xs font-bold uppercase tracking-widest mt-1">Cargando catálogo completo...</p>
     </div>
 
-    <div class="relative w-[800px] h-[800px] flex items-center justify-center">
-        <div onclick="loadData()" class="relative w-72 h-72 rounded-full orb-depth flex flex-col items-center justify-center p-md border-2 border-white/20 z-30 group cursor-pointer hover:scale-105 transition-all duration-500 glow-border">
-            <span id="sync-icon" class="material-symbols-outlined text-[64px] text-white mb-sm drop-shadow-md">sync</span>
-            <span class="font-serif-display text-white text-headline-md italic">Sincronizar</span>
-            <span id="counter-text" class="text-white/60 text-body-sm mt-xs">Click para actualizar</span>
+    <div id="main-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-y-auto custom-scroll pb-20 pr-4">
+        <div class="col-span-full py-20 text-center text-white/50">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <p>Accediendo a los datos de producción...</p>
         </div>
-
-        <div id="orb-1" class="absolute floating-card p-sm rounded-xl w-48 orbit-1 border-t-2 border-orange-500 opacity-0"></div>
-        <div id="orb-2" class="absolute floating-card p-sm rounded-xl w-56 orbit-2 border-t-2 border-purple-400 opacity-0"></div>
-        <div id="orb-3" class="absolute floating-card p-sm rounded-xl w-52 orbit-3 border-t-2 border-blue-400 opacity-0"></div>
-        <div id="orb-4" class="absolute floating-card p-sm rounded-xl w-44 orbit-4 border-t-2 border-pink-400 opacity-0"></div>
-        <div id="orb-5" class="absolute floating-card p-sm rounded-xl w-52 orbit-5 border-t-2 border-yellow-400 opacity-0"></div>
-
-        <div class="absolute inset-0 border border-white/10 rounded-full scale-[0.85] pointer-events-none"></div>
-        <div class="absolute inset-0 border border-white/5 rounded-full scale-[1.2] pointer-events-none"></div>
     </div>
 
-    <div class="absolute bottom-12 flex gap-md z-20">
-        <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-lg py-sm rounded-full font-semibold">
-            Semana 20 Activa
-        </div>
+    <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+        <div class="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-sky-400 blur-[120px] rounded-full"></div>
+        <div class="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] bg-blue-800 blur-[120px] rounded-full"></div>
     </div>
 </main>
 
@@ -174,6 +140,7 @@
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             const fullRows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+            // Buscamos la fila de cabeceras (ID / Total)
             let headerIndex = fullRows.findIndex(row => 
                 row.some(c => String(c).trim().toUpperCase() === 'ID') && 
                 row.some(c => String(c).trim().toUpperCase() === 'TOTAL')
@@ -195,47 +162,58 @@
                 return { id: String(item[keyID]).trim(), total: cleanNumber(item[keyTotal]) };
             });
 
-            document.getElementById('counter-text').innerText = `${allData.length} Refs Disponibles`;
-            renderOrbit(allData);
+            document.getElementById('counter-text').innerText = `${allData.length} Referencias con stock en positivo`;
+            renderGrid(allData);
         } catch (e) {
-            alert("Error cargando datos");
+            console.error(e);
         } finally {
             syncIcon.classList.remove('animate-spin');
         }
     }
 
-    function renderOrbit(data) {
-        const top5 = data.slice(0, 5);
-        for (let i = 1; i <= 5; i++) {
-            const orb = document.getElementById(`orb-${i}`);
-            const item = top5[i-1];
-            if (item) {
-                orb.style.opacity = "1";
-                orb.innerHTML = `
-                    <div class="flex justify-between items-start mb-xs">
-                        <span class="material-symbols-outlined text-white/80 text-sm">inventory</span>
-                        <span class="bg-green-500/20 text-green-200 px-xs py-[2px] rounded text-[10px] font-bold uppercase">Stock</span>
-                    </div>
-                    <p class="text-white/50 text-[10px] font-label-caps mb-1">ID PRODUCTO</p>
-                    <p class="text-white font-title-sm truncate">${item.id}</p>
-                    <div class="mt-2 pt-2 border-t border-white/10 flex justify-between items-center">
-                        <span class="text-white font-black text-lg">${Math.round(item.total)}</span>
-                        <span class="text-white/40 text-[9px] uppercase">unidades</span>
-                    </div>
-                `;
-            } else {
-                orb.style.opacity = "0";
-            }
+    function renderGrid(data) {
+        const grid = document.getElementById('main-grid');
+        grid.innerHTML = '';
+
+        if (data.length === 0) {
+            grid.innerHTML = '<p class="col-span-full text-center text-white/50 py-20 font-bold">No se han encontrado resultados.</p>';
+            return;
         }
+
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'floating-card p-5 rounded-2xl flex flex-col justify-between';
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-sky-300">
+                        <span class="material-symbols-outlined">package_2</span>
+                    </div>
+                    <span class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest">Disponible</span>
+                </div>
+                <div>
+                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-1">Referencia</p>
+                    <p class="text-white font-bold text-xl tracking-tight">${item.id}</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-end">
+                    <div>
+                        <p class="text-white/40 text-[10px] font-bold uppercase mb-1">Stock Proyectado</p>
+                        <p class="text-white font-black text-3xl leading-none">${Math.round(item.total)}</p>
+                    </div>
+                    <p class="text-sky-300/50 text-[10px] font-bold uppercase mb-1">unidades</p>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
     }
 
+    // Buscador en tiempo real para todas las referencias
     document.getElementById('search-input').addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         const filtered = allData.filter(d => d.id.toLowerCase().includes(term));
-        renderOrbit(filtered);
+        renderGrid(filtered);
     });
 
-    // Carga inicial
+    // Carga inicial al entrar
     loadData();
 </script>
 </body>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Stock 12 Semanas - InventoryPro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+          theme: {
+            extend: {
+              "colors": {
+                "primary": "#6366f1",
+                "success": "#22c55e",
+                "background": "#fdfcfe",
+                "surface": "rgba(255, 255, 255, 0.7)",
+                "on-surface": "#1e293b",
+                "on-surface-variant": "#64748b"
+              }
+            },
+          },
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: radial-gradient(circle at top right, #fef2f2, transparent), 
+                        radial-gradient(circle at bottom left, #eef2ff, transparent), 
+                        #fdfcfe; 
+        }
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.65); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.4); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); 
+        }
+        .vibrant-gradient { background: linear-gradient(135deg, #818cf8 0%, #f43f5e 100%); }
+        /* Scrollbar estética */
+        #table-body::-webkit-scrollbar { width: 6px; }
+        #table-body::-webkit-scrollbar-track { background: transparent; }
+        #table-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex items-center justify-center p-md md:p-lg">
+<main class="w-full max-w-2xl">
+    <div class="glass-card rounded-2xl p-lg md:p-xl transition-all duration-500">
+        <header class="text-center mb-lg">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full vibrant-gradient text-white mb-sm shadow-xl shadow-indigo-200">
+                <span class="material-symbols-outlined text-3xl">inventory_2</span>
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 mb-xs">InventoryPro</h1>
+            <p class="text-on-surface-variant font-medium">📦 Disponibilidad Inmediata (Proyectada 12W)</p>
+        </header>
+
+        <section class="relative mb-md">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <input type="text" id="search-input" placeholder="Buscar por ID de referencia..." 
+                   class="w-full pl-12 pr-4 py-4 rounded-xl border-none bg-white/60 shadow-sm focus:ring-2 focus:ring-primary focus:bg-white transition-all outline-none text-slate-700 font-medium">
+        </section>
+
+        <section>
+            <div class="flex items-center justify-between mb-sm px-2">
+                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest">Stock Positivo</h3>
+                <span id="counter" class="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">Sincronizando...</span>
+            </div>
+            
+            <div id="table-body" class="space-y-3 max-h-[450px] overflow-y-auto p-1">
+                <div class="flex flex-col items-center justify-center py-20 text-slate-400">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-4"></div>
+                    <p class="text-sm font-medium">Conectando con el almacén...</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-xl pt-lg border-t border-slate-200/50 text-center">
+            <div class="flex items-center justify-center gap-2 mb-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Actualizado en tiempo real</p>
+            </div>
+            <p class="text-[9px] text-slate-400 font-medium uppercase tracking-[0.2em]">InventoryPro Dashboard v2.0</p>
+        </footer>
+    </div>
+</main>
+
+<script>
+    // TU ENLACE CONFIGURADO
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOFHYjuBwOkQDfuedrjriM5oOpr10nc2JkTHqpgGgGviGA3Lsu38wnYD4njQIf9m3266qay2G0Z8ed/pub?gid=0&single=true&output=csv';
+    
+    let allData = [];
+
+    async function loadData() {
+        try {
+            const response = await fetch(SHEET_URL);
+            const csvText = await response.text();
+            
+            // Procesamos el CSV saltando la leyenda (range: 6)
+            const workbook = XLSX.read(csvText, { type: 'string' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rawRows = XLSX.utils.sheet_to_json(sheet, { range: 6 });
+
+            // Filtramos: ID válido, Total > 0 y no es la fila de totales
+            allData = rawRows.filter(item => {
+                const total = parseFloat(item.Total);
+                return item.ID && !isNaN(total) && total > 0 && item.ID.toString().toLowerCase() !== 'totales';
+            });
+
+            renderTable(allData);
+        } catch (error) {
+            console.error(error);
+            document.getElementById('table-body').innerHTML = `
+                <div class="text-center py-10">
+                    <span class="material-symbols-outlined text-4xl text-rose-400 mb-2">error</span>
+                    <p class="text-slate-600 font-medium">No se pudo cargar el stock.<br><span class="text-xs text-slate-400">Verifica la conexión o el enlace del Sheet.</span></p>
+                </div>`;
+        }
+    }
+
+    function renderTable(data) {
+        const tableBody = document.getElementById('table-body');
+        const counter = document.getElementById('counter');
+        tableBody.innerHTML = '';
+        
+        counter.innerText = `${data.length} Refs Disponibles`;
+
+        if (data.length === 0) {
+            tableBody.innerHTML = '<p class="text-center text-slate-400 py-10 font-medium">Sin stock positivo proyectado.</p>';
+            return;
+        }
+
+        data.forEach(item => {
+            const row = `
+                <div class="flex items-center justify-between p-4 bg-white/40 rounded-xl border border-white/60 shadow-sm hover:translate-x-1 hover:bg-white/80 transition-all cursor-default group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                            <span class="material-symbols-outlined">inventory</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-900 text-lg">${item.ID}</p>
+                            <div class="flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                <p class="text-[10px] text-green-600 font-bold uppercase tracking-wider">Stock Positivo</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right bg-white/60 px-4 py-2 rounded-lg border border-white/50">
+                        <p class="font-black text-slate-800 text-xl leading-none">${Math.round(item.Total)}</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">unidades</p>
+                    </div>
+                </div>
+            `;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    // Buscador instantáneo
+    document.getElementById('search-input').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allData.filter(item => 
+            item.ID.toString().toLowerCase().includes(term)
+        );
+        renderTable(filtered);
+    });
+
+    // Carga inicial
+    loadData();
+</script>
+</body>
+</html>

@@ -21,15 +21,9 @@
             <span class="material-symbols-outlined text-4xl">verified_user</span>
         </div>
         <h2 class="text-3xl font-black text-slate-900 mb-2 tracking-tighter">Acceso Injusa</h2>
-        <p class="text-slate-400 text-sm mb-8">Identifícate para gestionar el stock.</p>
-        
-        <input id="user-name-input" type="text" 
-               class="w-full bg-slate-100 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl px-6 py-4 text-center font-bold transition-all outline-none mb-4" 
-               placeholder="Nombre y Apellido">
-        
-        <button onclick="saveUser()" class="w-full bg-blue-900 text-white font-bold py-4 rounded-2xl hover:bg-blue-800 transition-all shadow-lg active:scale-95">
-            Entrar al Panel
-        </button>
+        <p class="text-slate-400 text-sm mb-8 font-medium">Identifícate para gestionar el stock.</p>
+        <input id="user-name-input" type="text" class="w-full bg-slate-100 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl px-6 py-4 text-center font-bold transition-all outline-none mb-4" placeholder="Nombre y Apellido">
+        <button onclick="saveUser()" class="w-full bg-blue-900 text-white font-bold py-4 rounded-2xl hover:bg-blue-800 shadow-lg active:scale-95 transition-all">Entrar</button>
     </div>
 </div>
 
@@ -39,9 +33,7 @@
             <h1 class="text-xl font-black text-blue-900">INJUSA</h1>
             <div class="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
                 <span id="current-user-tag" class="text-[10px] font-black text-blue-700 uppercase tracking-widest"></span>
-                <button onclick="logout()" class="flex items-center text-blue-400 hover:text-red-500 transition-colors">
-                    <span class="material-symbols-outlined text-sm">logout</span>
-                </button>
+                <button onclick="logout()" class="flex items-center text-blue-400 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-sm">logout</span></button>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -52,12 +44,12 @@
 
     <main class="mt-16 min-h-screen yolo-gradient p-4 md:p-8">
         <div class="mb-8 text-white">
-            <h2 class="text-4xl font-black italic tracking-tight">Reservas Live</h2>
+            <h2 class="text-4xl font-black italic tracking-tight">Panel de Reservas</h2>
             <div class="flex items-center gap-2 mt-2 text-white/60">
                 <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <p id="counter-text" class="text-[10px] font-bold uppercase tracking-widest">Cargando unidades...</p>
+                <p id="counter-text" class="text-[10px] font-bold uppercase tracking-widest">Cargando...</p>
                 <span class="mx-2">|</span>
-                <p id="timer-display" class="text-[10px] font-bold uppercase tracking-widest">Sesión Activa</p>
+                <p class="text-[10px] font-bold uppercase tracking-widest">Auto-Cierre: 15 min inactivo</p>
             </div>
         </div>
         <div id="main-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-24"></div>
@@ -68,37 +60,24 @@
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOFHYjuBwOkQDfuedrjriM5oOpr10nc2JkTHqpgGgGviGA3Lsu38wnYD4njQIf9m3266qay2G0Z8ed/pub?gid=0&single=true&output=csv';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrA1Orsz1fq-yqkjuV9O7A5QXKD3LskigAj_-ciPYgdG11EtMp31ye_xxrjlbzyqOPKw/exec';
     
-    // CONFIGURACIÓN DE TIEMPO (en minutos)
     const MINUTOS_INACTIVIDAD = 15;
-    
     let allData = [];
     let userName = localStorage.getItem('injusa_user');
     let t_inactividad;
 
-    window.onload = () => {
-        if (userName) initApp();
-        resetTimer(); // Iniciar cronómetro de actividad
-    };
+    window.onload = () => { if (userName) initApp(); resetTimer(); };
 
-    // --- LÓGICA DE CIERRE POR INACTIVIDAD ---
+    // --- SEGURIDAD: CIERRE POR INACTIVIDAD ---
     function resetTimer() {
         clearTimeout(t_inactividad);
-        if (userName) {
-            t_inactividad = setTimeout(logoutAutomatico, MINUTOS_INACTIVIDAD * 60 * 1000);
-        }
+        if (userName) t_inactividad = setTimeout(logoutAutomatico, MINUTOS_INACTIVIDAD * 60 * 1000);
     }
-
-    // Escuchar actividad del usuario
-    window.onmousemove = resetTimer;
-    window.onmousedown = resetTimer;
-    window.ontouchstart = resetTimer;
-    window.onclick = resetTimer;
-    window.onkeydown = resetTimer;
+    window.onmousemove = resetTimer; window.onmousedown = resetTimer; window.ontouchstart = resetTimer; window.onclick = resetTimer; window.onkeydown = resetTimer;
 
     function logoutAutomatico() {
         if (userName) {
             localStorage.removeItem('injusa_user');
-            alert("Sesión cerrada por inactividad (" + MINUTOS_INACTIVIDAD + " min). Por seguridad, identifícate de nuevo.");
+            alert("Sesión cerrada por inactividad. Identifícate de nuevo.");
             location.reload();
         }
     }
@@ -112,18 +91,13 @@
 
     function saveUser() {
         const input = document.getElementById('user-name-input').value.trim();
-        if (input.length < 3) return alert("Por favor, introduce tu nombre completo.");
+        if (input.length < 3) return alert("Introduce tu nombre completo.");
         localStorage.setItem('injusa_user', input);
         userName = input;
         initApp();
     }
 
-    function logout() {
-        if(confirm("¿Quieres cerrar la sesión actual?")){
-            localStorage.removeItem('injusa_user');
-            location.reload();
-        }
-    }
+    function logout() { if(confirm("¿Cerrar sesión?")) { localStorage.removeItem('injusa_user'); location.reload(); } }
 
     function cleanNumber(val) {
         if (!val) return 0;
@@ -142,26 +116,18 @@
             const workbook = XLSX.read(csvText, { type: 'string' });
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             const fullRows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-            let headerIdx = fullRows.findIndex(row => 
-                row.some(c => String(c).trim().toUpperCase() === 'ID') && 
-                row.some(c => String(c).trim().toUpperCase() === 'TOTAL')
-            );
-
+            let headerIdx = fullRows.findIndex(row => row.some(c => String(c).trim().toUpperCase() === 'ID') && row.some(c => String(c).trim().toUpperCase() === 'TOTAL'));
             if (headerIdx === -1) headerIdx = 6;
             const data = XLSX.utils.sheet_to_json(sheet, { range: headerIdx });
-
             allData = data.filter(item => {
                 const kID = Object.keys(item).find(k => k.trim().toUpperCase() === 'ID');
                 const kTotal = Object.keys(item).find(k => k.trim().toUpperCase() === 'TOTAL');
-                const idValue = item[kID] ? String(item[kID]).trim() : "";
-                return idValue && idValue.toLowerCase() !== 'totales' && cleanNumber(item[kTotal]) > 0;
+                return item[kID] && cleanNumber(item[kTotal]) > 0;
             }).map(item => {
                 const kID = Object.keys(item).find(k => k.trim().toUpperCase() === 'ID');
                 const kTotal = Object.keys(item).find(k => k.trim().toUpperCase() === 'TOTAL');
                 return { id: String(item[kID]).trim(), total: cleanNumber(item[kTotal]) };
             });
-
             renderGrid(allData);
             document.getElementById('counter-text').innerText = `${allData.length} Referencias Disponibles`;
         } catch (e) { console.error(e); }
@@ -169,23 +135,17 @@
     }
 
     async function reservar(id, stockMax) {
-        const cant = prompt(`¿Cuántas unidades de la Referencia ${id} quieres reservar?\n(Máximo disponible: ${Math.round(stockMax)})`);
+        const cant = prompt(`¿Unidades de la Referencia ${id} a reservar?\n(Disponible: ${Math.round(stockMax)})`);
         if (!cant || isNaN(cant) || cant <= 0 || parseInt(cant) > stockMax) return;
-
         const btn = event.target;
         btn.innerText = "Procesando...";
         btn.disabled = true;
-
         try {
             await fetch(`${SCRIPT_URL}?id=${id}&unidades=${cant}&nombre=${encodeURIComponent(userName)}`, { mode: 'no-cors' });
-            alert(`Reserva de ${cant} unidades confirmada.\nRegistrado a nombre de: ${userName}`);
+            alert(`Reserva de ${cant} unidades de la Ref. ${id} confirmada.`);
             setTimeout(loadData, 2000);
-        } catch (e) {
-            alert("Error al conectar.");
-        } finally {
-            btn.innerText = "Reservar Unidades";
-            btn.disabled = false;
-        }
+        } catch (e) { alert("Error de conexión."); }
+        finally { btn.innerText = "Reservar Unidades"; btn.disabled = false; }
     }
 
     function renderGrid(data) {
@@ -193,17 +153,21 @@
         grid.innerHTML = '';
         data.forEach(item => {
             const card = document.createElement('div');
-            card.className = 'floating-card p-6 rounded-[2rem] text-white shadow-2xl flex flex-col justify-between transition-all hover:scale-[1.02]';
+            card.className = 'floating-card p-6 rounded-[2.5rem] text-white shadow-2xl flex flex-col justify-between transition-all hover:scale-[1.02]';
             card.innerHTML = `
                 <div>
-                    <div class="flex justify-between items-center mb-6">
-                        <span class="bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">Referencia: ${item.id}</span>
-                        <span class="text-green-400 material-symbols-outlined">verified</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-[10px] font-black opacity-50 uppercase tracking-[0.2em]">Referencia</p>
+                        <span class="text-green-400 material-symbols-outlined text-sm">verified</span>
                     </div>
-                    <p class="text-5xl font-black mb-1 tracking-tighter">${Math.round(item.total)}</p>
-                    <p class="text-xs opacity-50 font-bold uppercase mb-8 text-sky-200 font-bold">Unidades Totales</p>
+                    <p class="text-5xl font-black mb-6 tracking-tighter leading-none break-all">${item.id}</p>
+                    
+                    <div class="flex items-baseline gap-2 mb-8">
+                        <p class="text-3xl font-bold">${Math.round(item.total)}</p>
+                        <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest">Unidades</p>
+                    </div>
                 </div>
-                <button onclick="reservar('${item.id}', ${item.total})" class="w-full bg-white text-blue-900 font-bold py-4 rounded-2xl hover:bg-blue-50 transition-all shadow-lg active:scale-95 uppercase text-xs tracking-widest">
+                <button onclick="reservar('${item.id}', ${item.total})" class="w-full bg-white text-blue-900 font-bold py-4 rounded-2xl hover:bg-blue-50 shadow-lg active:scale-95 uppercase text-xs tracking-widest">
                     Reservar Unidades
                 </button>
             `;
@@ -212,8 +176,7 @@
     }
 
     document.getElementById('search-input').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        renderGrid(allData.filter(d => d.id.toLowerCase().includes(term)));
+        renderGrid(allData.filter(d => d.id.toLowerCase().includes(e.target.value.toLowerCase())));
     });
 </script>
 </body>

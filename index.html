@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Injusa InventoryPro - Móvil & Tablet</title>
+    <title>Injusa InventoryPro - v3.0 Corregida</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -23,25 +23,20 @@
     </script>
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        
         .yolo-gradient { 
             background: radial-gradient(circle at top right, #26509F, #0b1c30), 
                         linear-gradient(135deg, #26509F 0%, #0ea5e9 100%); 
             background-blend-mode: overlay; 
         }
-
         .floating-card {
             backdrop-filter: blur(12px);
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.2s;
         }
-
-        /* Control del Menú Lateral en Móvil */
         #sidebar { transition: transform 0.3s ease-in-out; }
-        @media (max-width: 1024px) {
-            #sidebar.hidden-m { transform: translateX(-100%); }
-        }
+        @media (max-width: 1024px) { .hidden-m { transform: translateX(-100%); } }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
 </head>
 <body class="bg-surface font-sans text-slate-900 antialiased overflow-x-hidden">
@@ -49,58 +44,42 @@
 <aside id="sidebar" class="fixed left-0 top-0 h-full w-[280px] border-r border-slate-200 bg-white flex flex-col py-6 px-4 z-50 hidden-m lg:translate-x-0 shadow-2xl lg:shadow-none">
     <div class="flex items-center justify-between mb-10 px-2">
         <div>
-            <h1 class="text-2xl font-black text-injusa-blue tracking-tighter">INJUSA</h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">InventoryPro</p>
+            <h1 class="text-2xl font-black text-injusa-blue tracking-tighter text-blue-900">INJUSA</h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">InventoryPro 12W</p>
         </div>
-        <button onclick="toggleMenu()" class="lg:hidden text-slate-400">
-            <span class="material-symbols-outlined">close</span>
-        </button>
+        <button onclick="toggleMenu()" class="lg:hidden text-slate-400"><span class="material-symbols-outlined">close</span></button>
     </div>
     <nav class="flex-1 space-y-1">
         <div class="flex items-center gap-3 px-4 py-4 rounded-2xl bg-blue-50 text-injusa-blue font-bold">
             <span class="material-symbols-outlined">inventory_2</span>
-            <span>Stock 12 Semanas</span>
+            <span>Stock Excedente</span>
         </div>
     </nav>
-    <div class="mt-auto pt-6 border-t border-slate-100">
-        <div class="bg-slate-900 rounded-2xl p-4 text-white flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-injusa-blue flex items-center justify-center text-xs">LB</div>
-            <p class="text-xs font-bold">Ventas Injusa</p>
-        </div>
-    </div>
 </aside>
 
 <header class="fixed top-0 right-0 w-full lg:w-[calc(100%-280px)] h-16 bg-white border-b border-slate-200 flex justify-between items-center px-4 md:px-8 z-40">
     <div class="flex items-center gap-3">
-        <button onclick="toggleMenu()" class="lg:hidden p-2 text-slate-600">
-            <span class="material-symbols-outlined">menu</span>
-        </button>
-        <div class="relative w-40 md:w-80">
+        <button onclick="toggleMenu()" class="lg:hidden p-2 text-slate-600"><span class="material-symbols-outlined">menu</span></button>
+        <div class="relative w-44 md:w-80">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
-            <input id="search-input" class="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-injusa-blue/20" placeholder="Referencia..." type="text"/>
+            <input id="search-input" class="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-injusa-blue/20" placeholder="Buscar ref..." type="text"/>
         </div>
     </div>
-    <div class="flex items-center gap-2">
-        <button onclick="loadData()" class="p-2 hover:bg-slate-100 rounded-full text-slate-600">
-            <span id="sync-icon" class="material-symbols-outlined">sync</span>
-        </button>
-    </div>
+    <button onclick="loadData()" class="p-2 hover:bg-slate-100 rounded-full text-slate-600">
+        <span id="sync-icon" class="material-symbols-outlined">sync</span>
+    </button>
 </header>
 
-<main class="w-full lg:ml-[280px] lg:w-[calc(100%-280px)] mt-16 min-h-[calc(100vh-64px)] relative yolo-gradient flex flex-col p-4 md:p-8 overflow-y-auto">
-    
+<main class="w-full lg:ml-[280px] lg:w-[calc(100%-280px)] mt-16 min-h-[calc(100vh-64px)] relative yolo-gradient flex flex-col p-4 md:p-8">
     <div class="mb-6">
-        <h2 class="font-serif-display text-3xl md:text-4xl italic text-white drop-shadow-md">Stock Excedente</h2>
-        <div class="flex items-center gap-2 mt-1">
-            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            <p id="counter-text" class="text-white/60 text-[10px] font-bold uppercase tracking-widest">Sincronizando...</p>
-        </div>
+        <h2 class="font-serif-display text-3xl md:text-4xl italic text-white drop-shadow-md">Panel de Ventas</h2>
+        <p id="counter-text" class="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-1">Sincronizando con central...</p>
     </div>
 
     <div id="main-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6 pb-20">
         <div class="col-span-full py-20 text-center text-white/50">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-white mx-auto mb-4"></div>
-            <p class="text-sm">Accediendo a la red de Injusa...</p>
+            <p>Leyendo base de datos de Injusa...</p>
         </div>
     </div>
 </main>
@@ -111,18 +90,16 @@
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOFHYjuBwOkQDfuedrjriM5oOpr10nc2JkTHqpgGgGviGA3Lsu38wnYD4njQIf9m3266qay2G0Z8ed/pub?gid=0&single=true&output=csv';
     let allData = [];
 
-    // Función Menú Móvil
     function toggleMenu() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        sidebar.classList.toggle('hidden-m');
-        overlay.classList.toggle('hidden');
+        document.getElementById('sidebar').classList.toggle('hidden-m');
+        document.getElementById('overlay').classList.toggle('hidden');
     }
 
     function cleanNumber(val) {
         if (!val) return 0;
         let s = String(val).trim();
-        if (s === '–' || s === '-' || s === '') return 0;
+        if (s === '–' || s === '-' || s === '' || s.toLowerCase() === 'n/a') return 0;
+        // Quitar puntos de miles y cambiar coma por punto
         s = s.replace(/\./g, '').replace(',', '.');
         return parseFloat(s) || 0;
     }
@@ -131,35 +108,50 @@
         const syncIcon = document.getElementById('sync-icon');
         syncIcon.classList.add('animate-spin');
         try {
-            const response = await fetch(SHEET_URL + '&nocache=' + Date.now());
+            const response = await fetch(SHEET_URL + '&cb=' + Date.now());
             const csvText = await response.text();
             const workbook = XLSX.read(csvText, { type: 'string' });
-            const rawData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { range: 6 });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            
+            // Convertimos a JSON pero buscando la cabecera dinámicamente
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            let headerIdx = rows.findIndex(r => r.some(c => String(c).trim().toUpperCase() === 'ID'));
+            if (headerIdx === -1) headerIdx = 6;
 
-            allData = rawData.filter(item => {
-                const keyID = Object.keys(item).find(k => k.trim().toUpperCase() === 'ID');
-                const keyTotal = Object.keys(item).find(k => k.trim().toUpperCase() === 'TOTAL');
-                const id = item[keyID] ? String(item[keyID]).trim() : null;
-                const stock = cleanNumber(item[keyTotal]);
+            const data = XLSX.utils.sheet_to_json(sheet, { range: headerIdx });
+
+            allData = data.filter(item => {
+                const kID = Object.keys(item).find(k => k.trim().toUpperCase() === 'ID');
+                const kTotal = Object.keys(item).find(k => k.trim().toUpperCase() === 'TOTAL');
+                if (!kID || !kTotal) return false;
+
+                const id = String(item[kID]).trim();
+                const stock = cleanNumber(item[kTotal]);
                 return id && id.toLowerCase() !== 'totales' && stock > 0;
             }).map(item => {
-                const keyID = Object.keys(item).find(k => k.trim().toUpperCase() === 'ID');
-                const keyTotal = Object.keys(item).find(k => k.trim().toUpperCase() === 'TOTAL');
-                return { id: String(item[keyID]).trim(), total: cleanNumber(item[keyTotal]) };
+                const kID = Object.keys(item).find(k => k.trim().toUpperCase() === 'ID');
+                const kTotal = Object.keys(item).find(k => k.trim().toUpperCase() === 'TOTAL');
+                return { id: String(item[kID]).trim(), total: cleanNumber(item[kTotal]) };
             });
 
-            document.getElementById('counter-text').innerText = `${allData.length} Refs Disponibles`;
+            document.getElementById('counter-text').innerText = `${allData.length} Referencias Disponibles`;
             renderGrid(allData);
-        } catch (e) { console.error(e); } 
-        finally { syncIcon.classList.remove('animate-spin'); }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('main-grid').innerHTML = '<p class="text-white text-center col-span-full">Error al cargar datos.</p>';
+        } finally { syncIcon.classList.remove('animate-spin'); }
     }
 
     function renderGrid(data) {
         const grid = document.getElementById('main-grid');
         grid.innerHTML = '';
+        if (data.length === 0) {
+            grid.innerHTML = '<p class="text-white/50 text-center col-span-full py-20">No hay stock positivo.</p>';
+            return;
+        }
         data.forEach(item => {
             const card = document.createElement('div');
-            card.className = 'floating-card p-5 rounded-3xl flex flex-col justify-between shadow-lg';
+            card.className = 'floating-card p-5 rounded-3xl flex flex-col justify-between shadow-xl';
             card.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
                     <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-sky-300">
@@ -170,10 +162,10 @@
                 <p class="text-white font-bold text-2xl tracking-tight mb-4">${item.id}</p>
                 <div class="pt-4 border-t border-white/10 flex justify-between items-end">
                     <div>
-                        <p class="text-white/40 text-[10px] font-bold uppercase mb-1">Disponible</p>
+                        <p class="text-white/40 text-[10px] font-bold uppercase mb-1">Unidades</p>
                         <p class="text-white font-black text-3xl leading-none">${Math.round(item.total)}</p>
                     </div>
-                    <p class="text-sky-300/50 text-[10px] font-bold uppercase mb-1">Unidades</p>
+                    <p class="text-sky-300/50 text-[10px] font-bold uppercase mb-1">12 Semanas</p>
                 </div>
             `;
             grid.appendChild(card);

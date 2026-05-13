@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Injusa InventoryPro - v3.0 Corregida</title>
+    <title>Injusa InventoryPro - Sistema de Reservas</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -32,6 +32,7 @@
             backdrop-filter: blur(12px);
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
         }
         #sidebar { transition: transform 0.3s ease-in-out; }
         @media (max-width: 1024px) { .hidden-m { transform: translateX(-100%); } }
@@ -44,17 +45,26 @@
 <aside id="sidebar" class="fixed left-0 top-0 h-full w-[280px] border-r border-slate-200 bg-white flex flex-col py-6 px-4 z-50 hidden-m lg:translate-x-0 shadow-2xl lg:shadow-none">
     <div class="flex items-center justify-between mb-10 px-2">
         <div>
-            <h1 class="text-2xl font-black text-injusa-blue tracking-tighter text-blue-900">INJUSA</h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">InventoryPro 12W</p>
+            <h1 class="text-2xl font-black text-injusa-blue tracking-tighter">INJUSA</h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Portal de Reservas</p>
         </div>
         <button onclick="toggleMenu()" class="lg:hidden text-slate-400"><span class="material-symbols-outlined">close</span></button>
     </div>
     <nav class="flex-1 space-y-1">
         <div class="flex items-center gap-3 px-4 py-4 rounded-2xl bg-blue-50 text-injusa-blue font-bold">
-            <span class="material-symbols-outlined">inventory_2</span>
-            <span>Stock Excedente</span>
+            <span class="material-symbols-outlined">shopping_cart_checkout</span>
+            <span>Reserva de Stock</span>
         </div>
     </nav>
+    <div class="mt-auto pt-6 border-t border-slate-100">
+        <div class="bg-slate-900 rounded-2xl p-4 text-white flex items-center gap-3 shadow-lg">
+            <div class="w-8 h-8 rounded-full bg-injusa-blue flex items-center justify-center text-xs font-bold">LB</div>
+            <div>
+                <p class="text-xs font-bold">Comercial Activo</p>
+                <p class="text-[10px] opacity-50">Injusa Sales Dept.</p>
+            </div>
+        </div>
+    </div>
 </aside>
 
 <header class="fixed top-0 right-0 w-full lg:w-[calc(100%-280px)] h-16 bg-white border-b border-slate-200 flex justify-between items-center px-4 md:px-8 z-40">
@@ -62,7 +72,7 @@
         <button onclick="toggleMenu()" class="lg:hidden p-2 text-slate-600"><span class="material-symbols-outlined">menu</span></button>
         <div class="relative w-44 md:w-80">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
-            <input id="search-input" class="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-injusa-blue/20" placeholder="Buscar ref..." type="text"/>
+            <input id="search-input" class="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-injusa-blue/20" placeholder="Buscar referencia..." type="text"/>
         </div>
     </div>
     <button onclick="loadData()" class="p-2 hover:bg-slate-100 rounded-full text-slate-600">
@@ -72,14 +82,17 @@
 
 <main class="w-full lg:ml-[280px] lg:w-[calc(100%-280px)] mt-16 min-h-[calc(100vh-64px)] relative yolo-gradient flex flex-col p-4 md:p-8">
     <div class="mb-6">
-        <h2 class="font-serif-display text-3xl md:text-4xl italic text-white drop-shadow-md">Panel de Ventas</h2>
-        <p id="counter-text" class="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-1">Sincronizando con central...</p>
+        <h2 class="font-serif-display text-3xl md:text-4xl italic text-white drop-shadow-md">Stock 12 Semanas</h2>
+        <div class="flex items-center gap-2 mt-1">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <p id="counter-text" class="text-white/60 text-[10px] font-bold uppercase tracking-widest">Sincronizando con Google Sheets...</p>
+        </div>
     </div>
 
     <div id="main-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6 pb-20">
         <div class="col-span-full py-20 text-center text-white/50">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-white mx-auto mb-4"></div>
-            <p>Leyendo base de datos de Injusa...</p>
+            <p>Accediendo a la base de datos de Injusa...</p>
         </div>
     </div>
 </main>
@@ -87,7 +100,10 @@
 <div id="overlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
 
 <script>
+    // CONFIGURACIÓN
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOFHYjuBwOkQDfuedrjriM5oOpr10nc2JkTHqpgGgGviGA3Lsu38wnYD4njQIf9m3266qay2G0Z8ed/pub?gid=0&single=true&output=csv';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrA1Orsz1fq-yqkjuV9O7A5QXKD3LskigAj_-ciPYgdG11EtMp31ye_xxrjlbzyqOPKw/exec';
+    
     let allData = [];
 
     function toggleMenu() {
@@ -98,8 +114,7 @@
     function cleanNumber(val) {
         if (!val) return 0;
         let s = String(val).trim();
-        if (s === '–' || s === '-' || s === '' || s.toLowerCase() === 'n/a') return 0;
-        // Quitar puntos de miles y cambiar coma por punto
+        if (s === '–' || s === '-' || s === '') return 0;
         s = s.replace(/\./g, '').replace(',', '.');
         return parseFloat(s) || 0;
     }
@@ -112,9 +127,8 @@
             const csvText = await response.text();
             const workbook = XLSX.read(csvText, { type: 'string' });
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            
-            // Convertimos a JSON pero buscando la cabecera dinámicamente
             const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            
             let headerIdx = rows.findIndex(r => r.some(c => String(c).trim().toUpperCase() === 'ID'));
             if (headerIdx === -1) headerIdx = 6;
 
@@ -123,9 +137,7 @@
             allData = data.filter(item => {
                 const kID = Object.keys(item).find(k => k.trim().toUpperCase() === 'ID');
                 const kTotal = Object.keys(item).find(k => k.trim().toUpperCase() === 'TOTAL');
-                if (!kID || !kTotal) return false;
-
-                const id = String(item[kID]).trim();
+                const id = item[kID] ? String(item[kID]).trim() : null;
                 const stock = cleanNumber(item[kTotal]);
                 return id && id.toLowerCase() !== 'totales' && stock > 0;
             }).map(item => {
@@ -134,39 +146,78 @@
                 return { id: String(item[kID]).trim(), total: cleanNumber(item[kTotal]) };
             });
 
-            document.getElementById('counter-text').innerText = `${allData.length} Referencias Disponibles`;
             renderGrid(allData);
-        } catch (e) {
-            console.error(e);
-            document.getElementById('main-grid').innerHTML = '<p class="text-white text-center col-span-full">Error al cargar datos.</p>';
-        } finally { syncIcon.classList.remove('animate-spin'); }
+            document.getElementById('counter-text').innerText = `${allData.length} Referencias Disponibles`;
+        } catch (e) { console.error(e); }
+        finally { syncIcon.classList.remove('animate-spin'); }
+    }
+
+    // FUNCIÓN DE RESERVA
+    async function reservarStock(id, stockDisponible) {
+        const unidades = prompt(`¿Cuántas unidades de la Ref. ${id} quieres reservar? (Máximo: ${Math.round(stockDisponible)})`);
+        
+        if (!unidades) return;
+        const numUnidades = parseInt(unidades);
+
+        if (isNaN(numUnidades) || numUnidades <= 0) {
+            alert("Por favor, introduce un número válido.");
+            return;
+        }
+
+        if (numUnidades > stockDisponible) {
+            alert("No hay suficiente stock para esa cantidad.");
+            return;
+        }
+
+        // Feedback visual
+        const btn = event.currentTarget;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-sm">sync</span> Procesando...`;
+
+        try {
+            // Llamada al Google Apps Script
+            const res = await fetch(`${SCRIPT_URL}?id=${id}&unidades=${numUnidades}`, { mode: 'no-cors' });
+            
+            // Como usamos no-cors por seguridad de Google, no podemos leer el "SUCCESS" directamente,
+            // pero si no hay error de red, asumimos que se ha enviado.
+            alert(`¡Reserva de ${numUnidades} unidades enviada!\nEl stock se actualizará en unos segundos.`);
+            
+            // Refrescamos los datos después de un momento para que Google procese el cambio
+            setTimeout(loadData, 2500);
+            
+        } catch (error) {
+            alert("Error al conectar con el servidor de reservas.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
     }
 
     function renderGrid(data) {
         const grid = document.getElementById('main-grid');
         grid.innerHTML = '';
-        if (data.length === 0) {
-            grid.innerHTML = '<p class="text-white/50 text-center col-span-full py-20">No hay stock positivo.</p>';
-            return;
-        }
         data.forEach(item => {
             const card = document.createElement('div');
-            card.className = 'floating-card p-5 rounded-3xl flex flex-col justify-between shadow-xl';
+            card.className = 'floating-card p-5 rounded-3xl flex flex-col justify-between shadow-xl text-white';
             card.innerHTML = `
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex justify-between items-center mb-6">
                     <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-sky-300">
                         <span class="material-symbols-outlined">package_2</span>
                     </div>
-                    <span class="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">En Stock</span>
-                </div>
-                <p class="text-white font-bold text-2xl tracking-tight mb-4">${item.id}</p>
-                <div class="pt-4 border-t border-white/10 flex justify-between items-end">
-                    <div>
-                        <p class="text-white/40 text-[10px] font-bold uppercase mb-1">Unidades</p>
-                        <p class="text-white font-black text-3xl leading-none">${Math.round(item.total)}</p>
+                    <div class="text-right">
+                        <p class="text-[9px] font-bold opacity-50 uppercase tracking-widest">Disponible</p>
+                        <p class="text-2xl font-black leading-none">${Math.round(item.total)}</p>
                     </div>
-                    <p class="text-sky-300/50 text-[10px] font-bold uppercase mb-1">12 Semanas</p>
                 </div>
+                <div class="mb-6">
+                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-widest">Referencia</p>
+                    <p class="text-xl font-bold tracking-tight">${item.id}</p>
+                </div>
+                <button onclick="reservarStock('${item.id}', ${item.total})" class="w-full bg-white text-injusa-blue py-3 rounded-2xl font-bold text-sm shadow-lg hover:bg-blue-50 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                    Reservar Stock
+                </button>
             `;
             grid.appendChild(card);
         });
